@@ -7,3 +7,4 @@ This project is intended as a learning exercise to create a crypto trading bot, 
 Testing this change
 
 Bitches
+FUCK YEAH lololol
