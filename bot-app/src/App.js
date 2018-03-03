@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, Link} from 'react-router-dom';
-
-import Header from './components/header'
+import LeaderBoard from './components/LeaderBoard';
+import Header from './components/header';
 import './App.css';
 
 const Home = () => <h1>Home</h1>;
@@ -16,9 +16,10 @@ class App extends Component {
                 <div className="Navbar">
                     <Header/>
                 </div>
-            <Route path='/' component={Home}/>
+            <Route path='/' exact component={Home}/>
             <Route path='/page1' component={Page1}/>
             <Route path='/page2' component={Page2}/>
+            <Route path='/LeaderBoard' component={LeaderBoard}/>
             </div>
         </BrowserRouter>
     );

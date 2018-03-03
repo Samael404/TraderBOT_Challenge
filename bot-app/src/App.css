@@ -32,3 +32,10 @@ span.left {
 span.right {
   float:right;
 }
+
+.Table-header {
+  background-color: gray;
+  color: blue;
+  padding: 10px;
+  text-align: center;
+}
