@@ -18,6 +18,7 @@ def write_json():
         json.dump(open_file, output_data)
         print("Generated output data.")
 
-
-debug = read_json()
-debug2 = write_json()
+def main():
+    read_json()
+    write_json()
+    print("All debug functions run.  See individual status events for more information.")

@@ -49,7 +49,10 @@ info: launch specific user bot
 		      ...
                   ] 
 }
- 
+
+### Package Dependencies:
+
+pip install -U flask-cors
 
 
 ### Items Needed
