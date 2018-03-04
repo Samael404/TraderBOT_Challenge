@@ -10,7 +10,10 @@ class Header extends Component {
                     <li><Link to="/">Home</Link></li>
                     <li><Link to="/Page1">Page1</Link></li>
                     <li><Link to="/Page2">Page2</Link></li>
+<<<<<<< HEAD
                     <li><Link to="/LeaderBoard">LeaderBoard</Link></li>
+=======
+>>>>>>> 3830c9528e041f65968dd8f1aaf9ea7e8b723662
                 </ul>
             </div>
         );
