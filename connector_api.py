@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Author: JLV
+# Author: JLV, KEG
 # Date: 3/2/2018
 # Purpose: Connector API for web application. 
 #    Provides services for bot launches, data requests, and user interaction.
@@ -28,7 +28,7 @@ def login(user):
 @app.route("/bots/<user>")
 def bot_info(user):
     ''' provide information on user bots '''
-    path = "/home/kgarre/TraderBOT_Challenge/bots"
+    path = os.path.expanduser("~/TraderBOT_Challenge/bots")
     path = os.chdir(path)
     path = os.getcwd()
     active_user = str(path) + '/' + str(user)
@@ -54,7 +54,7 @@ def bot_info(user):
 @app.route("/bots/<user>/<bot_name>/start")
 def bot_launch(user, bot_name):
     ''' launch a bot '''
-    path = "/home/kgarre/TraderBOT_Challenge/bots/" + str(user)
+    path = os.path.expanduser("~/TraderBOT_Challenge/bots/" + str(user))
     path = os.chdir(path)
     
     output = {'user': user, 'bot_name': bot_name, 'launch': True}
