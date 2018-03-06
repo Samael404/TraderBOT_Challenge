@@ -9,21 +9,64 @@ from flask_cors import CORS, cross_origin
 import json
 import os
 from shutil import copy2
+import mysql.connector
+
 
 app = Flask(__name__)
 CORS(app)
+
 
 @app.route("/login/<user>")
 def login(user):
     ''' provide simple (read - insecure) authentication '''
     print("User Submitted: {}".format(user))
-###  Need to update the logic here to connect to DB and login information.  The script needs to check if a user exists in the DB, create if not, and return the user information.  We are ignoring tokenization for now.      
-#    try:
-#       check db for user
-#    except:
-#       print user does not exist, creating new user
+###  Updated the logic here to connect to DB and login information.  The script now checks if a user exists (as a table) in the DB and creates if not.
+###  Still needs to return the user information to the JSON output.      
+    db_config = {
+            'user': 'root',
+            'password': 'classpass1',
+            'host': '127.0.0.1',
+            'database': 'traderbot_challenge',
+                }
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        print("Connection succeeded.") 
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+    cmd = "CREATE TABLE {} (trx_date DATE NOT NULL UNIQUE, trx_amount INT NOT NULL, avg_trx INT NOT NULL, net_gain INT NOT NULL, net_loss INT NOT NULL, runtime INT NOT NULL)".format(user)
+
+    cursor = cnx.cursor()
+
+    try:
+        cursor.execute(cmd)
+        print("Creating table {}: ".format(user), end='')
+    except mysql.connector.Error as err:
+        print("Error: ", err)
+
+#Still getting errors when I try to use the errorcode.ER_ below.
+#Need to get these exeptions up in Alpha.
+        #if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+        #    print("Table already exists.")
+        #else:
+        #    print(err.msg)
+    else:
+        print("OK")
+        
+    cursor.close()
+    cnx.close()
+    print("Connection closed.")    
+
+#Still need logic here to fill in the JSON response for login.
+
     output = {'user': user, 'token': None}
     return json.dumps(output)
+
 
 @app.route("/bots/<user>")
 def bot_info(user):
@@ -56,7 +99,7 @@ def bot_launch(user, bot_name):
     ''' launch a bot '''
     path = os.path.expanduser("~/TraderBOT_Challenge/bots/" + str(user))
     path = os.chdir(path)
-    
+        
     output = {'user': user, 'bot_name': bot_name, 'launch': True}
     # TODO: Suggestion to utilize importlib functionality to dynamically try and load path of python bot
     # - then your requirement will be to have the same hook in calls for every bot (aka a template file will be needed)
