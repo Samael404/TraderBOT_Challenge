@@ -39,7 +39,7 @@ def login(user):
         else:
             print(err)
 
-    cmd = "CREATE TABLE {} (trx_date DATE NOT NULL UNIQUE, trx_amount INT NOT NULL, avg_trx INT NOT NULL, net_gain INT NOT NULL, net_loss INT NOT NULL, runtime INT NOT NULL)".format(user)
+    cmd = "CREATE TABLE {} (bot_name VARCHAR(20) NOT NULL, bot_ver INT NOT NULL, trx_date DATE NOT NULL UNIQUE, total_trx INT NOT NULL, avg_gain INT NOT NULL, start_bal INT NOT NULL, end_bal INT NOT NULL, runtime INT NOT NULL)".format(user)
 
     cursor = cnx.cursor()
 
@@ -47,7 +47,7 @@ def login(user):
         cursor.execute(cmd)
         print("Creating table {}: ".format(user), end='')
     except mysql.connector.Error as err:
-        print("Error: ", err)
+        print("Error encountered: ", err)
 
 #Still getting errors when I try to use the errorcode.ER_ below.
 #Need to get these exeptions up in Alpha.
