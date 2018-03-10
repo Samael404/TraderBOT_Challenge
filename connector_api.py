@@ -10,7 +10,7 @@ import json
 import os
 from shutil import copy2
 import mysql.connector
-
+from mysql.connector import errorcode
 
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +21,8 @@ def login(user):
     ''' provide simple (read - insecure) authentication '''
     print("User Submitted: {}".format(user))
 ###  Updated the logic here to connect to DB and login information.  The script now checks if a user exists (as a table) in the DB and creates if not.
-###  Still needs to return the user information to the JSON output.      
+###  Per 3.10 conversation, this only needs to assume the DB has been created & connect to it      
+
     db_config = {
             'user': 'root',
             'password': 'classpass1',
@@ -38,26 +39,27 @@ def login(user):
             print("Database does not exist")
         else:
             print(err)
-
-    cmd = "CREATE TABLE {} (bot_name VARCHAR(20) NOT NULL, bot_ver INT NOT NULL, trx_date DATE NOT NULL UNIQUE, total_trx INT NOT NULL, avg_gain INT NOT NULL, start_bal INT NOT NULL, end_bal INT NOT NULL, runtime INT NOT NULL)".format(user)
-
+#Need to use users table, check if already present, add if not
     cursor = cnx.cursor()
-
     try:
-        cursor.execute(cmd)
-        print("Creating table {}: ".format(user), end='')
+        query = "SELECT username FROM users WHERE username LIKE " + str(user)
+        cursor.execute(query)
+        print("Username found.")
     except mysql.connector.Error as err:
-        print("Error encountered: ", err)
+        print(err)
+#        cmd = ("CREATE TABLE {} (username VARCHAR(30) UNIQUE NOT NULL, password VARCHAR(30) NOT NULL, created DATE NOT NULL, modified DATE NOT NULL)".format(user)
 
-#Still getting errors when I try to use the errorcode.ER_ below.
-#Need to get these exeptions up in Alpha.
-        #if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-        #    print("Table already exists.")
-        #else:
-        #    print(err.msg)
-    else:
-        print("OK")
-        
+   # try:
+        #     cursor.execute(cmd)
+   #     print("Creating table {}: ".format(user), end='')
+   # except mysql.connector.Error as err:
+        # if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+            #     print(err.msg)
+       # else:
+            #        print("Encountered the following error: ", err.msg)
+   # else:
+        #        print("OK")
+    cnx.commit()    
     cursor.close()
     cnx.close()
     print("Connection closed.")    
