@@ -1,0 +1,70 @@
+
+
+h1 {
+  font-size: 20px;
+}
+
+.col {
+  width: 100px;
+  height: 50px;
+  background-color: darkgray;
+  border: 1px solid black;
+  font-size: 1rem;
+}
+
+
+body {
+  background-image: url("http://www.tokkoro.com/picsup/3073563-bitcoin_coin_coinbase_collectable_cryptocurrency_numismatic_titanium.jpg");
+  background-size: 'cover';
+  background-color: white;
+  fill-opacity: inherit;
+  background-position-y: -300px;
+  
+}
+
+  
+
+div#crypto-container {
+  
+  width: 70%;
+  margin: 0 auto 4px auto;
+  padding: 1em;
+  
+}
+
+span.left {
+  font-weight: bold;
+}
+
+span.right {
+  float:right;
+}
+
+
+.Table-header {
+  background-color: gray;
+  color: blue;
+  padding: 10px;
+  text-align: center;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color:none;
+}
+
+li {
+  float: left;
+  padding-right: 15px;
+  padding-left: 15px;
+  font-size: 3rem;
+  color: black;
+}
+
+h1 {
+  font-size: 3rem;
+  color: black;
+}
