@@ -21,8 +21,6 @@ CORS(app)
 def login(user):
     ''' provide simple (read - insecure) authentication '''
     print("User Submitted: {}".format(user))
-###  Updated the logic here to connect to DB and login information.  The script now checks if a user exists (as a table) in the DB and creates if not.
-###  Per 3.10 conversation, this only needs to assume the DB has been created & connect to it      
 
     db_config = {
             'user': 'root',
@@ -30,6 +28,7 @@ def login(user):
             'host': '127.0.0.1',
             'database': 'traderbot_challenge',
                 }
+
     #Checks the DB connection
     try:
         cnx = mysql.connector.connect(**db_config)
@@ -49,9 +48,10 @@ def login(user):
         query = ("SELECT * FROM users WHERE username = '%s'")
         query_data = str(user)
         cursor.execute(query, query_data)
-#I tried adding this if statement in, but with it here it does not print the 'username found' yet still moves to the else block below
-        if cursor.rowcount==1:
-            print("Username found.")
+#I tried adding the below if statement in, but with it here it does not print the 'username found' yet still moves to the else block below
+#Without the 'if', it prints 'username found' even if it's not in the table
+      # if cursor.rowcount==1:
+        print("Username found.")
     
     except mysql.connector.Error as err:
         print(err)
