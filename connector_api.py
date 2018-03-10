@@ -49,6 +49,7 @@ def login(user):
         query = ("SELECT * FROM users WHERE username = '%s'")
         query_data = str(user)
         cursor.execute(query, query_data)
+#I tried adding this if statement in, but with it here it does not print the 'username found' yet still moves to the else block below
         if cursor.rowcount==1:
             print("Username found.")
     
