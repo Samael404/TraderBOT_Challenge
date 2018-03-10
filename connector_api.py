@@ -11,6 +11,7 @@ import os
 from shutil import copy2
 import mysql.connector
 from mysql.connector import errorcode
+from datetime import date, datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -40,25 +41,29 @@ def login(user):
         else:
             print(err)
 #Need to use users table, check if already present, add if not
+
     cursor = cnx.cursor()
+
     try:
-        query = "SELECT username FROM users WHERE username LIKE " + str(user)
+        query = "SELECT username FROM users WHERE username = " + str(user)
         cursor.execute(query)
         print("Username found.")
+    
     except mysql.connector.Error as err:
         print(err)
-#        cmd = ("CREATE TABLE {} (username VARCHAR(30) UNIQUE NOT NULL, password VARCHAR(30) NOT NULL, created DATE NOT NULL, modified DATE NOT NULL)".format(user)
+        if err.errno == errorcode.ER_BAD_FIELD_ERROR: 
+            cmd = ("INSERT INTO users (username, password, created, modified)"            "VALUES (%s, %s, %s, %s)") 
+            date = datetime.now().date()
+            cmd_values = (str(user), 'password', str(date), str(date))
+            cursor.execute(cmd, cmd_values)
+            if err.errno == errorcode.ER_PARSE_ERROR:
+                print("Your insert user string syntax is incorrect.")
+        elif err.errno == errorcode.ER_DUP_ENTRY:
+            print("User entry already in Table.")
+    
+    else:
+        print("OK")
 
-   # try:
-        #     cursor.execute(cmd)
-   #     print("Creating table {}: ".format(user), end='')
-   # except mysql.connector.Error as err:
-        # if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-            #     print(err.msg)
-       # else:
-            #        print("Encountered the following error: ", err.msg)
-   # else:
-        #        print("OK")
     cnx.commit()    
     cursor.close()
     cnx.close()
