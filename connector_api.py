@@ -30,6 +30,7 @@ def login(user):
             'host': '127.0.0.1',
             'database': 'traderbot_challenge',
                 }
+    #Checks the DB connection
     try:
         cnx = mysql.connector.connect(**db_config)
         print("Connection succeeded.") 
@@ -40,14 +41,16 @@ def login(user):
             print("Database does not exist")
         else:
             print(err)
-#Need to use users table, check if already present, add if not
 
-    cursor = cnx.cursor()
+    #Tries to query the username and checks if it's in the user table or not
+    cursor = cnx.cursor(buffered=True)
 
     try:
-        query = "SELECT username FROM users WHERE username = " + str(user)
-        cursor.execute(query)
-        print("Username found.")
+        query = ("SELECT * FROM users WHERE username = '%s'")
+        query_data = str(user)
+        cursor.execute(query, query_data)
+        if cursor.rowcount==1:
+            print("Username found.")
     
     except mysql.connector.Error as err:
         print(err)
