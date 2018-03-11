@@ -52,8 +52,12 @@ info: launch specific user bot
 
 ### Package Dependencies:
 
-pip install -U flask-cors
+Must be install using the -H sudo flag:
 
+pip3 install -U flask
+pip3 install -U flask-cors
+pip3 install -U mysql-connector
+apt-get install mysql-server
 
 ### Items Needed
 
