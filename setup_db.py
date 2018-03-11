@@ -1,7 +1,36 @@
 #!/usr/bin/python3
 
 import mysql.connector
+from mysql.connector import errorcode
 from datetime import date, datetime
+import getpass
+
+CREDS='.sql_creds'
+dbcreds = { 'user': 'root', 'password': '', 'host': '127.0.0.1' }
+conn = ''
+ 
+def get_db_password():
+    print(" - looking for db password..." , end='')
+    try:
+        with open(CREDS) as f:
+            password = f.read()
+        f.close()
+        print(" OK")
+    except:
+        print(" FAILED. Must create password file.")
+        password = getpass.getpass('Enter DB password: ')
+        fo = open(CREDS, 'w')
+        fo.write(password)
+        print(" - created new password file: {}".format(CREDS))
+    dbcreds['password'] = password
+
+def connect_db():
+    print(" - testing connection to db...", end='')
+        try:
+            cnx = mysql.connector.connect(**dbcreds)
+            print(" OK")
+        except:
+            print(" FAILED")
 
 #check for DB
 def create_db():
@@ -9,7 +38,7 @@ def create_db():
         cmd = "CREATE DATABASE traderbot_challenge"
         cursor.execute(cmd)
     except mysql.connector.Error as err:
-        print(err)
+        print("Error creating traderbot_challenge database: ", err)
     else:
         print("OK: Created Database traderbot_challenge")
 
@@ -23,11 +52,11 @@ def create_tables():
     
     #switch to DB
     try:
-        cnx.database = "main"
+        cnx.database = "traderbot_challenge"
     except:
-        print("Failed to change to database main.")
+        print("Failed to change to database traderbot_challenge.")
     else:
-        print("OK: Switched to database main")
+        print("OK: Switched to database traderbot_challenge")
     #actually create tables
     try:
         cursor.execute(make_users)
@@ -64,13 +93,15 @@ def add_first_entry():
     else:
         print("OK: Added user to users table.")
 
-print("Launching DB setup...")
-cnx = mysql.connector.connect(user='root', password='classpass1', host='127.0.0.1')
-cursor = cnx.cursor()
-create_db()
-create_tables()
-add_first_entry()
-cnx.commit()
 
-cursor.close()
-cnx.close()
+if __name__ == '__main__':
+    print("Launching mySQL setup...")
+    cnx = mysql.connector.connect(user='root', password='classpass1', host='127.0.0.1')
+    cursor = cnx.cursor()
+    create_db()
+    create_tables()
+    add_first_entry()
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    exit(0)
