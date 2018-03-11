@@ -1,34 +1,88 @@
 #!/usr/bin/python3
-# Author: JLV
+# Author: JLV, KEG
 # Date: 3/2/2018
 # Purpose: Connector API for web application. 
-#    Provides services for bot launches, data requests, and user interaction.
+#Provides services for bot launches, data requests, and user interaction.
 
 from flask import Flask
 from flask_cors import CORS, cross_origin
 import json
 import os
 from shutil import copy2
+import mysql.connector
+from mysql.connector import errorcode
+from datetime import date, datetime
 
 app = Flask(__name__)
 CORS(app)
+
 
 @app.route("/login/<user>")
 def login(user):
     ''' provide simple (read - insecure) authentication '''
     print("User Submitted: {}".format(user))
-###  Need to update the logic here to connect to DB and login information.  The script needs to check if a user exists in the DB, create if not, and return the user information.  We are ignoring tokenization for now.      
-#    try:
-#       check db for user
-#    except:
-#       print user does not exist, creating new user
+
+    db_config = {
+            'user': 'root',
+            'password': 'classpass1',
+            'host': '127.0.0.1',
+            'database': 'traderbot_challenge',
+                }
+
+    #Checks the DB connection
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        print("Connection succeeded.") 
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+    #Tries to query the username and checks if it's in the user table or not
+    cursor = cnx.cursor(buffered=True)
+
+    try:
+        query = ("SELECT * FROM users WHERE username = '%s'")
+        query_data = str(user)
+        cursor.execute(query, query_data)
+#I tried adding the below if statement in, but with it here it does not print the 'username found' yet still moves to the else block below
+#Without the 'if', it prints 'username found' even if it's not in the table
+      # if cursor.rowcount==1:
+        print("Username found.")
+    
+    except mysql.connector.Error as err:
+        print(err)
+        if err.errno == errorcode.ER_BAD_FIELD_ERROR: 
+            cmd = ("INSERT INTO users (username, password, created, modified)"            "VALUES (%s, %s, %s, %s)") 
+            date = datetime.now().date()
+            cmd_values = (str(user), 'password', str(date), str(date))
+            cursor.execute(cmd, cmd_values)
+            if err.errno == errorcode.ER_PARSE_ERROR:
+                print("Your insert user string syntax is incorrect.")
+        elif err.errno == errorcode.ER_DUP_ENTRY:
+            print("User entry already in Table.")
+    
+    else:
+        print("OK")
+
+    cnx.commit()    
+    cursor.close()
+    cnx.close()
+    print("Connection closed.")    
+
+#Still need logic here to fill in the JSON response for login.
+
     output = {'user': user, 'token': None}
     return json.dumps(output)
+
 
 @app.route("/bots/<user>")
 def bot_info(user):
     ''' provide information on user bots '''
-    path = "/home/kgarre/TraderBOT_Challenge/bots"
+    path = os.path.expanduser("~/TraderBOT_Challenge/bots")
     path = os.chdir(path)
     path = os.getcwd()
     active_user = str(path) + '/' + str(user)
@@ -54,9 +108,9 @@ def bot_info(user):
 @app.route("/bots/<user>/<bot_name>/start")
 def bot_launch(user, bot_name):
     ''' launch a bot '''
-    path = "/home/kgarre/TraderBOT_Challenge/bots/" + str(user)
+    path = os.path.expanduser("~/TraderBOT_Challenge/bots/" + str(user))
     path = os.chdir(path)
-    
+        
     output = {'user': user, 'bot_name': bot_name, 'launch': True}
     return json.dumps(output)
 
