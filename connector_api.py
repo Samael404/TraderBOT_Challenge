@@ -2,7 +2,7 @@
 # Author: JLV, KEG
 # Date: 3/2/2018
 # Purpose: Connector API for web application. 
-#    Provides services for bot launches, data requests, and user interaction.
+#Provides services for bot launches, data requests, and user interaction.
 
 from flask import Flask
 from flask_cors import CORS, cross_origin
