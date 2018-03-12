@@ -24,6 +24,7 @@ def get_db_password():
         print(" - created new password file: {}".format(CREDS))
     dbcreds['password'] = password
 
+#This connection test will fail the first time, depending on how the mysql DB password was first set
 def connect_db():
     print(" - testing connection to db...", end='')
     try:
