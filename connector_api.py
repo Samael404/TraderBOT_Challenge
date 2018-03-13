@@ -64,9 +64,11 @@ def login(user):
         cursor.execute(query, user)
         row = cursor.fetchone()
         print(row)
-        if str(row) == 'None':
+        if str(row) != 'None':
             print("Username found.")
-    
+        else:
+            print("Not sure what to do about this.")
+
     except mysql.connector.Error as err:
         print(err)
         if err.errno == errorcode.ER_BAD_FIELD_ERROR: 
