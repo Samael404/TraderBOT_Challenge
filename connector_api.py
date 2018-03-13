@@ -22,12 +22,27 @@ def login(user):
     ''' provide simple (read - insecure) authentication '''
     print("User Submitted: {}".format(user))
 
+    print(" - looking for db password..." , end='')
+    
+    CREDS='.sql_creds'
     db_config = {
             'user': 'root',
             'password': 'classpass1',
             'host': '127.0.0.1',
             'database': 'traderbot_challenge',
                 }
+    try:
+        with open(CREDS) as f:
+            password = f.read()
+        f.close()
+        print(" OK")
+    except:
+        print(" FAILED. Must create password file.")
+        password = getpass.getpass('Enter DB password: ')
+        fo = open(CREDS, 'w')
+        fo.write(password)
+        print(" - created new password file: {}".format(CREDS))
+    db_config['password'] = password
 
     #Checks the DB connection
     try:
@@ -46,12 +61,11 @@ def login(user):
 
     try:
         query = ("SELECT * FROM users WHERE username = '%s'")
-        query_data = str(user)
-        cursor.execute(query, query_data)
-#I tried adding the below if statement in, but with it here it does not print the 'username found' yet still moves to the else block below
-#Without the 'if', it prints 'username found' even if it's not in the table
-      # if cursor.rowcount==1:
-        print("Username found.")
+        cursor.execute(query, user)
+        row = cursor.fetchone()
+        print(row)
+        if str(row) == 'None':
+            print("Username found.")
     
     except mysql.connector.Error as err:
         print(err)
@@ -65,15 +79,15 @@ def login(user):
         elif err.errno == errorcode.ER_DUP_ENTRY:
             print("User entry already in Table.")
     
-    else:
-        print("OK")
+    #else:
+        #        print("OK")
 
     cnx.commit()    
     cursor.close()
     cnx.close()
     print("Connection closed.")    
 
-#Still need logic here to fill in the JSON response for login.
+#Still need logic here to fill in the JSON response for login, specifically add the 'modified' field.
 
     output = {'user': user, 'token': None}
     return json.dumps(output)
