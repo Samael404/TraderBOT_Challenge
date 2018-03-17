@@ -22,7 +22,8 @@ These are the unifying structures for data needed by the different parts of the 
 /scores
 {
     "username": varchar(30), unique key
-    "bot_ver": varchar(20)
+    "bot_name":varchar(30)
+    "bot_ver": int(3)
     "last_login": datetime
     "total_tx": int(11) 
     "gain_loss": int(11)
