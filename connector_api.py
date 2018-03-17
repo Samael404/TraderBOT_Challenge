@@ -85,18 +85,21 @@ def login(user):
     else:
         print("  OK - Database user segments complete.")
 
-#The last bit of logic to add here is the update 'modified' field on new logins for existing users
+    try:
+        query = ("UPDATE users SET modified = current_date() WHERE username = '{}'".format(user))
+        cursor.execute(query)
+        output['modified']=datetime.now()
+        print("Updated last login date")
+
+    except:
+        print("Oops.  Super busted.")
 
     cnx.commit()    
     cursor.close()
     cnx.close()
     print("Connection closed.")    
 
-#Still need logic here to fill in the JSON response for login, specifically add the 'modified' field.
-
-    #output = {'user': user 'token': None}
-    #return json.dumps([])
-    return json.dumps(output)
+    return json.dumps(output, indent=4, sort_keys=True, default=str)
 
 
 @app.route("/bots/<user>")
