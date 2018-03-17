@@ -46,7 +46,7 @@ def create_db():
 #check table
 def create_tables():
     make_users = "CREATE TABLE users (username VARCHAR(30) NOT NULL UNIQUE, password VARCHAR(30) NOT NULL, created DATE NOT NULL, modified DATE NOT NULL)"
-    make_trade_data = "CREATE TABLE trade_data (username VARCHAR(30) NOT NULL, bot_name VARCHAR(30) NOT NULL, bot_ver VARCHAR(5), trx_datetime DATETIME NOT NULL, total_trx INT NOT NULL, avg_gain INT NOT NULL, start_bal INT NOT NULL, end_bal INT NOT NULL, tot_acct_bal INT NOT NULL, runtime INT NOT NULL)"
+    make_trade_data = "CREATE TABLE trade_data (username VARCHAR(30) NOT NULL, bot_name VARCHAR(30) NOT NULL, bot_ver INT(3), trx_datetime DATETIME NOT NULL, total_trx INT NOT NULL, avg_gain INT NOT NULL, start_bal INT NOT NULL, end_bal INT NOT NULL, tot_acct_bal INT NOT NULL, runtime INT NOT NULL)"
     
 #Will need to modify the actual fields for the trade_data & possibly the results table
     make_results = "CREATE TABLE results (username VARCHAR(30) NOT NULL UNIQUE, last_login DATETIME NOT NULL, total_tx INT NOT NULL, gain_loss INT NOT NULL)"
