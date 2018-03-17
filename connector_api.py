@@ -31,6 +31,8 @@ def login(user):
             'host': '127.0.0.1',
             'database': 'traderbot_challenge',
                 }
+    output = {}
+
     try:
         with open(CREDS) as f:
             password = f.read()
@@ -60,29 +62,30 @@ def login(user):
     cursor = cnx.cursor(buffered=True)
 
     try:
-        query = ("SELECT * FROM users WHERE username = '\%s'")
-        cursor.execute(query, user)
+        query = ("SELECT * FROM users WHERE username = '{}'".format(user))
+        cursor.execute(query)
         row = cursor.fetchone()
-        print(row)
         if row is not None:
             print("Username found.")
+            output['cnx']='OK'
+            output['user']=user
         else:
-            print("Not sure what to do about this.")
-
+            print("  - Username not found in DB tables; exiting.")
+            output['cnx']='OK'
+            output['user']='User does not exist'
     except mysql.connector.Error as err:
         print(err)
         if err.errno == errorcode.ER_BAD_FIELD_ERROR: 
-            cmd = ("INSERT INTO users (username, password, created, modified)"            "VALUES (%s, %s, %s, %s)") 
-            date = datetime.now().date()
-            cmd_values = (str(user), 'password', str(date), str(date))
-            cursor.execute(cmd, cmd_values)
-            if err.errno == errorcode.ER_PARSE_ERROR:
-                print("Your insert user string syntax is incorrect.")
+            print(err)
+        elif err.errno == errorcode.ER_PARSE_ERROR:
+            print("Your insert user string syntax is incorrect: ", err)
         elif err.errno == errorcode.ER_DUP_ENTRY:
-            print("User entry already in Table.")
+            print("User entry already in Table: ", err)
     
-    #else:
-        #        print("OK")
+    else:
+        print("  OK - Database user segments complete.")
+
+#The last bit of logic to add here is the update 'modified' field on new logins for existing users
 
     cnx.commit()    
     cursor.close()
@@ -91,9 +94,9 @@ def login(user):
 
 #Still need logic here to fill in the JSON response for login, specifically add the 'modified' field.
 
-    output = {'user': user, 'token': None}
-    return json.dumps([])
-# return json.dumps(output)
+    #output = {'user': user 'token': None}
+    #return json.dumps([])
+    return json.dumps(output)
 
 
 @app.route("/bots/<user>")
