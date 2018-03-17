@@ -60,11 +60,11 @@ def login(user):
     cursor = cnx.cursor(buffered=True)
 
     try:
-        query = ("SELECT * FROM users WHERE username = '%s'")
+        query = ("SELECT * FROM users WHERE username = '\%s'")
         cursor.execute(query, user)
         row = cursor.fetchone()
         print(row)
-        if str(row) != None:
+        if row is not None:
             print("Username found.")
         else:
             print("Not sure what to do about this.")
@@ -92,7 +92,8 @@ def login(user):
 #Still need logic here to fill in the JSON response for login, specifically add the 'modified' field.
 
     output = {'user': user, 'token': None}
-    return json.dumps(output)
+    return json.dumps([])
+# return json.dumps(output)
 
 
 @app.route("/bots/<user>")
