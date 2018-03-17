@@ -3,6 +3,14 @@
 
 Welcome to the TraderBOT Arena project. This project is intended to be a learning exercise with the goal of creating a way to compare results of competing crypto trading bots. Currently under construction but will be updated soon.
 
+### Installation Files and Instructions
+install.sh
+--> Installs package dependencies for Python, downloads and performs basic mySQL database configuration
+--> sh install.sh
+
+setup_db.py
+--> Runs through the database creation and table setup with default user
+--> python3 setup_db.py
 ### Architecture Diagrams
 _Simple Architecture Diagram_
 ![Architecture Simple](/docs/architecture_simple.png)
@@ -10,18 +18,15 @@ _Simple Architecture Diagram_
 ### JSON Connectors
 These are the unifying structures for data needed by the different parts of the application.
 
-###### Results Data Structure
+###### Results Data Structure Output from Bot activity
 /scores
 {
-    "id": integer, unique key
-    "user": string, unique key
-    "bot_name": string, unique per user
-    "bot_version": string, user set
-    "date_started": date
-    "date_ended": date
-    "init_total": float
-    "final_total": float
-    "trades_made": integer
+    "username": varchar(30), unique key
+    "bot_name":varchar(30)
+    "bot_ver": int(3)
+    "last_login": datetime
+    "total_tx": int(11) 
+    "gain_loss": int(11)
 }
 
 ###### Users Data Structure
@@ -49,19 +54,4 @@ info: launch specific user bot
 		      ...
                   ] 
 }
-
-### Package Dependencies:
-
-pip install -U flask-cors
-
-
-### Items Needed
-
-* Python Flask API to connect web application to bot launches
-* Python Flask API to connect web application to database
-* Web Application to connect to make API calls to Python Flask API
-* Database setup script with schema to match results expected by Web Application
-  * Tables Needed: Users, Results
-* Install scripts to provide dependencies and put files in correct locations.
-
 
