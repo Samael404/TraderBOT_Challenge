@@ -6,11 +6,25 @@ from datetime import date, datetime
 import getpass
 
 #Remove the password from the file before pushing to master
-dbcreds = { 'user': 'root', 'password': 'classpass1', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
- 
+dbcreds = { 'user': 'root', 'password': '', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
+CREDS='.sql_creds'
+
 #This connection test will fail the first time, depending on how the mysql DB password was first set
 def connect_db():
     print(" - testing connection to db...", end='')
+    try:
+        with open(CREDS) as f:
+            password = f.read()
+        f.close()
+        print(" OK")
+    except:
+        print(" FAILED. Must create password file.")
+        password = getpass.getpass('Enter DB password: ')
+        fo = open(CREDS, 'w')
+        fo.write(password)
+        print(" - created new password file: {}".format(CREDS))
+    dbcreds['password'] = password
+
     try:
         cnx = mysql.connector.connect(**dbcreds)
         print(" OK")
