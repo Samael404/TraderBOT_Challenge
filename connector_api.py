@@ -136,7 +136,6 @@ def bot_launch(user, bot_name):
     path = os.chdir(path)
         
     output = {'user': user, 'bot_name': bot_name, 'launch': True}
-<<<<<<< HEAD
     return json.dumps(output, indent=4, sort_keys=True, default=str)
     # TODO: Suggestion to utilize importlib functionality to dynamically try and load path of python bot
     # - then your requirement will be to have the same hook in calls for every bot (aka a template file will be needed)
@@ -146,13 +145,10 @@ def bot_launch(user, bot_name):
     # - suggestion to manage extra threads by storing bot_name, user, and pid in this api - that way if we could check if a process is still running
     # - simpler method would be to just have another api call for the bots to make but that is sloppier long term
 =======
->>>>>>> origin/master
-    return json.dumps(output)
 
 @app.route("/scores")
 def score_data():
     ''' returns db information on all bot run statistics ''' 
-<<<<<<< HEAD
     output = {}
 
 #Checks cred path for DB creds
@@ -206,9 +202,6 @@ def score_data():
         elif err.errno == errorcode.ER_DUP_ENTRY:
             print("User entry already in Table: ", err)
     
-=======
-    output = [{'id': 0, 'user': 'test', 'bot_name': 'botA', 'bot_version': 'v1.0', 'init_total': 1000.00, 'init_final': 2000.00, 'trades_made': 5}] 
->>>>>>> origin/master
     return json.dumps(output) 
 
 if __name__ == '__main__':
