@@ -5,34 +5,19 @@ from mysql.connector import errorcode
 from datetime import date, datetime
 import getpass
 
-CREDS='.sql_creds'
-dbcreds = { 'user': 'root', '': '', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
-cnx = ''
+#Remove the password from the file before pushing to master
+dbcreds = { 'user': 'root', 'password': 'classpass1', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
  
-def get_db_password():
-    print(" - looking for db password..." , end='')
-    try:
-        with open(CREDS) as f:
-            password = f.read()
-        f.close()
-        print(" OK")
-    except:
-        print(" FAILED. Must create password file.")
-        password = getpass.getpass('Enter DB password: ')
-        fo = open(CREDS, 'w')
-        fo.write(password)
-        print(" - created new password file: {}".format(CREDS))
-    dbcreds['password'] = password
-
 #This connection test will fail the first time, depending on how the mysql DB password was first set
 def connect_db():
     print(" - testing connection to db...", end='')
     try:
         cnx = mysql.connector.connect(**dbcreds)
         print(" OK")
+        return cnx
     except:
         print(" FAILED")
-
+        return False
 #check for DB
 def create_db():
     try:
@@ -97,10 +82,10 @@ def add_first_entry():
 
 if __name__ == '__main__':
     print("Launching mySQL setup...")
-    cnx = mysql.connector.connect(user='root', password='classpass1', host='127.0.0.1')
+    cnx = connect_db()
+    if cnx == False:
+        exit(1)
     cursor = cnx.cursor()
-    get_db_password()
-    connect_db()
     create_db()
     create_tables()
     add_first_entry()
