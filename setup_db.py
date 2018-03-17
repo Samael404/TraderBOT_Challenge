@@ -6,7 +6,7 @@ from datetime import date, datetime
 import getpass
 
 CREDS='.sql_creds'
-dbcreds = { 'user': 'root', 'password': '', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
+dbcreds = { 'user': 'root', '': '', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
 cnx = ''
  
 def get_db_password():
