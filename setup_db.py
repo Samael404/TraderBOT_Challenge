@@ -40,6 +40,7 @@ def create_db():
     try:
         cmd = "CREATE DATABASE traderbot_challenge"
         cursor.execute(cmd)
+        dbcreds['database'] = "traderbot_challenge"
     except mysql.connector.Error as err:
         print("Error creating traderbot_challenge database: ", err)
     else:
