@@ -6,11 +6,11 @@ from datetime import date, datetime
 import getpass
 
 #Remove the password from the file before pushing to master
-dbcreds = { 'user': 'root', 'password': '', 'database': 'traderbot_challenge', 'host': '127.0.0.1' }
+dbcreds = { 'user': 'root', 'password': '', 'database': '', 'host': '127.0.0.1' }
 CREDS='.sql_creds'
 
 #This connection test will fail the first time, depending on how the mysql DB password was first set
-def connect_db():
+def get_creds():
     print(" - testing connection to db...", end='')
     try:
         with open(CREDS) as f:
@@ -25,14 +25,17 @@ def connect_db():
         print(" - created new password file: {}".format(CREDS))
     dbcreds['password'] = password
 
+#check for DB
+def db_connect():
+
     try:
         cnx = mysql.connector.connect(**dbcreds)
-        print(" OK")
+        print(" OK - Connected to DB.")
         return cnx
     except:
         print(" FAILED")
         return False
-#check for DB
+
 def create_db():
     try:
         cmd = "CREATE DATABASE traderbot_challenge"
@@ -41,6 +44,7 @@ def create_db():
         print("Error creating traderbot_challenge database: ", err)
     else:
         print("OK: Created Database traderbot_challenge")
+
 
 #check table
 def create_tables():
@@ -83,7 +87,7 @@ def add_first_entry():
     cmd = "INSERT INTO users (username, password, created, modified) VALUES (%s, %s, %s, %s)"
     date = str(datetime.now().date())
     username = str(input("Please enter your desired username: "))
-    password = str(input("Please enter your desired password.  This cannot be changed, so make it as strong as you like: "))
+    password = str(input("Please enter your desired user password.  This cannot be changed, so make it as strong as you like: "))
     data = (username, password, date, date)
         
     try:
@@ -96,7 +100,8 @@ def add_first_entry():
 
 if __name__ == '__main__':
     print("Launching mySQL setup...")
-    cnx = connect_db()
+    get_creds()
+    cnx = db_connect()
     if cnx == False:
         exit(1)
     cursor = cnx.cursor()
