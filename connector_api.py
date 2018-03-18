@@ -12,10 +12,18 @@ from shutil import copy2
 import mysql.connector
 from mysql.connector import errorcode
 from datetime import date, datetime
+import getpass
 
 app = Flask(__name__)
 CORS(app)
 
+CREDS='.sql_creds'
+db_config = {
+            'user': 'root',
+            'password': '',
+            'host': '127.0.0.1',
+            'database': 'traderbot_challenge',
+             }
 
 @app.route("/login/<user>")
 def login(user):
@@ -24,13 +32,6 @@ def login(user):
 
     print(" - looking for db password..." , end='')
     
-    CREDS='.sql_creds'
-    db_config = {
-            'user': 'root',
-            'password': 'classpass1',
-            'host': '127.0.0.1',
-            'database': 'traderbot_challenge',
-                }
     output = {}
 
     try:
@@ -85,18 +86,21 @@ def login(user):
     else:
         print("  OK - Database user segments complete.")
 
-#The last bit of logic to add here is the update 'modified' field on new logins for existing users
+    try:
+        query = ("UPDATE users SET modified = current_date() WHERE username = '{}'".format(user))
+        cursor.execute(query)
+        output['modified']=datetime.now()
+        print("Updated last login date")
+
+    except:
+        print("Oops. Super busted.")
 
     cnx.commit()    
     cursor.close()
     cnx.close()
     print("Connection closed.")    
 
-#Still need logic here to fill in the JSON response for login, specifically add the 'modified' field.
-
-    #output = {'user': user 'token': None}
-    #return json.dumps([])
-    return json.dumps(output)
+    return json.dumps(output, indent=4, sort_keys=True, default=str)
 
 
 @app.route("/bots/<user>")
@@ -123,7 +127,7 @@ def bot_info(user):
             bots_available += files
     
     output = {'user': user, 'bots_available': bots_available}
-    return json.dumps(output) 
+    return json.dumps(output, indent=4, sort_keys=True, default=str)
 
 @app.route("/bots/<user>/<bot_name>/start")
 def bot_launch(user, bot_name):
@@ -132,12 +136,72 @@ def bot_launch(user, bot_name):
     path = os.chdir(path)
         
     output = {'user': user, 'bot_name': bot_name, 'launch': True}
-    return json.dumps(output)
+    return json.dumps(output, indent=4, sort_keys=True, default=str)
+    # TODO: Suggestion to utilize importlib functionality to dynamically try and load path of python bot
+    # - then your requirement will be to have the same hook in calls for every bot (aka a template file will be needed)
+    # - function will return failure if the bot hasn't been found - otherwise always a success
+    # - will have to launch a async thread for bot and check back on a regular basis for results
+    # - which means this function will be responsible for writing to the database
+    # - suggestion to manage extra threads by storing bot_name, user, and pid in this api - that way if we could check if a process is still running
+    # - simpler method would be to just have another api call for the bots to make but that is sloppier long term
+=======
 
 @app.route("/scores")
 def score_data():
     ''' returns db information on all bot run statistics ''' 
-    output = [{'id': 0, 'user': 'test', 'bot_name': 'botA', 'bot_version': 'v1.0', 'init_total': 1000.00, 'init_final': 2000.00, 'trades_made': 5}] 
+    output = {}
+
+#Checks cred path for DB creds
+    try:
+        with open(CREDS) as f:
+            password = f.read()
+        f.close()
+        print(" OK")
+    except:
+        print(" FAILED. Must create password file.")
+        password = getpass.getpass('Enter DB password: ')
+        fo = open(CREDS, 'w')
+        fo.write(password)
+        print(" - created new password file: {}".format(CREDS))
+    db_config['password'] = password
+
+#Checks the DB connection
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        print("Connection succeeded.") 
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+#Queries DB results table and returns the values
+    
+    cursor = cnx.cursor(buffered=True)
+
+    try:
+        query = ("SELECT * FROM results")
+        cursor.execute(query)
+        row = cursor.fetchall()
+        print(row)
+        if row is not None:
+            print("All user statistic information found.")
+            output['data']=row
+        else:
+            print("  - User statistics not found in DB tables; exiting.")
+            output['data']='Unable to pull data from results table'
+
+    except mysql.connector.Error as err:
+        print(err)
+        if err.errno == errorcode.ER_BAD_FIELD_ERROR: 
+            print(err)
+        elif err.errno == errorcode.ER_PARSE_ERROR:
+            print("Your insert user string syntax is incorrect: ", err)
+        elif err.errno == errorcode.ER_DUP_ENTRY:
+            print("User entry already in Table: ", err)
+    
     return json.dumps(output) 
 
 if __name__ == '__main__':
