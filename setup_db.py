@@ -23,7 +23,7 @@ def get_creds():
         fo = open(CREDS, 'w')
         fo.write(password)
         print(" - created new password file: {}".format(CREDS))
-    dbcreds['password'] = password
+    dbcreds['password'] = password.rstrip()
 
 #check for DB
 def db_connect():
@@ -32,8 +32,8 @@ def db_connect():
         cnx = mysql.connector.connect(**dbcreds)
         print(" OK - Connected to DB.")
         return cnx
-    except:
-        print(" FAILED")
+    except mysql.connect.Error as err:
+        print(" FAILED with the following error: ", err)
         return False
 
 def create_db():
