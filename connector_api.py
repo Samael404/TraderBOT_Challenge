@@ -100,7 +100,13 @@ def login(user):
     cnx.close()
     print("Connection closed.")    
 
-    return json.dumps(output, indent=4, sort_keys=True, default=str)
+    response = app.response_class(
+            response = json.dumps(output, indent=4, sort_keys=True, default=str),
+            status=200,
+            mimetype='application/json'
+            )
+
+    return response
 
 
 @app.route("/bots/<user>")
@@ -127,7 +133,14 @@ def bot_info(user):
             bots_available += files
     
     output = {'user': user, 'bots_available': bots_available}
-    return json.dumps(output, indent=4, sort_keys=True, default=str)
+    
+    bot_response = app.response_class(
+            response = json.dumps(output, indent=4, sort_keys=True, default=str),
+            status=200,
+            mimetype='application/json'
+            )
+    
+    return bot_response
 
 @app.route("/bots/<user>/<bot_name>/start")
 def bot_launch(user, bot_name):
@@ -136,14 +149,20 @@ def bot_launch(user, bot_name):
     path = os.chdir(path)
         
     output = {'user': user, 'bot_name': bot_name, 'launch': True}
-    return json.dumps(output, indent=4, sort_keys=True, default=str)
-    # TODO: Suggestion to utilize importlib functionality to dynamically try and load path of python bot
-    # - then your requirement will be to have the same hook in calls for every bot (aka a template file will be needed)
-    # - function will return failure if the bot hasn't been found - otherwise always a success
-    # - will have to launch a async thread for bot and check back on a regular basis for results
-    # - which means this function will be responsible for writing to the database
-    # - suggestion to manage extra threads by storing bot_name, user, and pid in this api - that way if we could check if a process is still running
-    # - simpler method would be to just have another api call for the bots to make but that is sloppier long term
+
+    launch_response = app.response_class(
+            response = json.dumps(output, indent=4, sort_keys=True, default=str),
+            status=200,
+            mimetype='application/json'
+            )
+
+    return launch_response
+
+### TODO: Suggestion to utilize importlib functionality to dynamically try and load path of python bot then your requirement will be to have the same hook in calls for every bot (aka a template file will be needed)
+# - function will return failure if the bot hasn't been found - otherwise always a success
+# - will have to launch a async thread for bot and check back on a regular basis for results which means this function will be responsible for writing to the database
+# - suggestion to manage extra threads by storing bot_name, user, and pid in this api - that way if we could check if a process is still running
+# - simpler method would be to just have another api call for the bots to make but that is sloppier long term
 =======
 
 @app.route("/scores")
@@ -201,8 +220,14 @@ def score_data():
             print("Your insert user string syntax is incorrect: ", err)
         elif err.errno == errorcode.ER_DUP_ENTRY:
             print("User entry already in Table: ", err)
+      
+    score_response = app.response_class(
+            response = json.dumps(output, indent=4, sort_keys=True, default=str),
+            status=200,
+            mimetype='application/json'
+            )
     
-    return json.dumps(output) 
+    return score_response 
 
 if __name__ == '__main__':
     app.run(debug=True)
